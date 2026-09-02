@@ -41,8 +41,11 @@ def init_db():
     conn.close()
 
 
+# ---------------------------
+# PROJETOS
+# ---------------------------
+
 def criar_projeto(nome, descricao, data_criacao):
-    """Insere um novo projeto na base de dados."""
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -56,7 +59,6 @@ def criar_projeto(nome, descricao, data_criacao):
 
 
 def listar_projetos():
-    """Devolve a lista de projetos existentes."""
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -65,3 +67,35 @@ def listar_projetos():
 
     conn.close()
     return projetos
+
+
+# ---------------------------
+# TAREFAS
+# ---------------------------
+
+def criar_tarefa(id_projeto, titulo, prioridade, estado, data_criacao):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO tarefas (id_projeto, titulo, prioridade, estado, data_criacao)
+        VALUES (?, ?, ?, ?, ?)
+    """, (id_projeto, titulo, prioridade, estado, data_criacao))
+
+    conn.commit()
+    conn.close()
+
+
+def listar_tarefas(id_projeto):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id, titulo, prioridade, estado, data_criacao
+        FROM tarefas
+        WHERE id_projeto = ?
+    """, (id_projeto,))
+
+    tarefas = cursor.fetchall()
+    conn.close()
+    return tarefas
