@@ -4,7 +4,11 @@ from db import (
     criar_projeto,
     listar_projetos,
     criar_tarefa,
-    listar_tarefas
+    listar_tarefas,
+    editar_tarefa,
+    remover_tarefa,
+    filtrar_tarefas_por_estado,
+    filtrar_tarefas_por_prioridade
 )
 
 
@@ -55,6 +59,10 @@ def menu_tarefas(id_projeto):
         print("\n=== GESTÃO DE TAREFAS ===")
         print("1 - Listar tarefas")
         print("2 - Criar tarefa")
+        print("3 - Editar tarefa")
+        print("4 - Remover tarefa")
+        print("5 - Filtrar por estado")
+        print("6 - Filtrar por prioridade")
         print("0 - Voltar")
 
         opcao = input("Escolha uma opção: ").strip()
@@ -65,6 +73,14 @@ def menu_tarefas(id_projeto):
             opcao_listar_tarefas(id_projeto)
         elif opcao == "2":
             opcao_criar_tarefa(id_projeto)
+        elif opcao == "3":
+            opcao_editar_tarefa(id_projeto)
+        elif opcao == "4":
+            opcao_remover_tarefa(id_projeto)
+        elif opcao == "5":
+            opcao_filtrar_estado(id_projeto)
+        elif opcao == "6":
+            opcao_filtrar_prioridade(id_projeto)
         else:
             print("Opção inválida.")
 
@@ -96,6 +112,92 @@ def opcao_criar_tarefa(id_projeto):
     print("Tarefa criada com sucesso!")
 
 
+def opcao_editar_tarefa(id_projeto):
+    tarefas = listar_tarefas(id_projeto)
+
+    if not tarefas:
+        print("\nNão existem tarefas para editar.")
+        return
+
+    print("\n=== EDITAR TAREFA ===")
+    for t in tarefas:
+        print(f"{t[0]} - {t[1]}")
+
+    try:
+        id_tarefa = int(input("ID da tarefa: ").strip())
+    except ValueError:
+        print("ID inválido.")
+        return
+
+    ids_validos = [t[0] for t in tarefas]
+    if id_tarefa not in ids_validos:
+        print("Tarefa não encontrada.")
+        return
+
+    novo_titulo = input("Novo título: ").strip()
+    nova_prioridade = input("Nova prioridade (baixa/média/alta): ").strip().lower()
+    novo_estado = input("Novo estado (a fazer/em progresso/concluída): ").strip().lower()
+
+    editar_tarefa(id_tarefa, novo_titulo, nova_prioridade, novo_estado)
+    print("Tarefa atualizada com sucesso!")
+
+
+def opcao_remover_tarefa(id_projeto):
+    tarefas = listar_tarefas(id_projeto)
+
+    if not tarefas:
+        print("\nNão existem tarefas para remover.")
+        return
+
+    print("\n=== REMOVER TAREFA ===")
+    for t in tarefas:
+        print(f"{t[0]} - {t[1]}")
+
+    try:
+        id_tarefa = int(input("ID da tarefa: ").strip())
+    except ValueError:
+        print("ID inválido.")
+        return
+
+    ids_validos = [t[0] for t in tarefas]
+    if id_tarefa not in ids_validos:
+        print("Tarefa não encontrada.")
+        return
+
+    remover_tarefa(id_tarefa)
+    print("Tarefa removida com sucesso!")
+
+
+def opcao_filtrar_estado(id_projeto):
+    estado = input("Estado (a fazer/em progresso/concluída): ").strip().lower()
+    tarefas = filtrar_tarefas_por_estado(id_projeto, estado)
+
+    if not tarefas:
+        print("\nNenhuma tarefa encontrada com esse estado.")
+        return
+
+    print("\n=== TAREFAS FILTRADAS POR ESTADO ===")
+    for t in tarefas:
+        print(f"ID: {t[0]} | Título: {t[1]} | Prioridade: {t[2]} | Estado: {t[3]} | Criada em: {t[4]}")
+
+
+def opcao_filtrar_prioridade(id_projeto):
+    prioridade = input("Prioridade (baixa/média/alta): ").strip().lower()
+    tarefas = filtrar_tarefas_por_prioridade(id_projeto, prioridade)
+
+    if not tarefas:
+        print("\nNenhuma tarefa encontrada com essa prioridade.")
+        return
+
+    print("\n=== TAREFAS FILTRADAS POR PRIORIDADE ===")
+    for t in tarefas:
+        print(f"ID: {t[0]} | Título: {t[1]} | Prioridade: {t[2]} | Estado: {t[3]} | Criada em: {t[4]}")
+
+
+# ---------------------------
+# MAIN
+# ---------------------------
+
 def opcao_gerir_tarefas():
     projetos = listar_projetos()
 
@@ -121,10 +223,6 @@ def opcao_gerir_tarefas():
 
     menu_tarefas(id_projeto)
 
-
-# ---------------------------
-# MAIN
-# ---------------------------
 
 def main():
     init_db()
